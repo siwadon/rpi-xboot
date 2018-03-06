@@ -1,7 +1,7 @@
 .globl _start
 _start:
     mov sp,#0x8000
-    bl notmain
+    bl kernel_main
 hang: b hang
 
 .globl PUT32
