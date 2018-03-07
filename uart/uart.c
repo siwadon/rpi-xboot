@@ -6,7 +6,7 @@ extern void uart_init(void);
 extern void uart_putc(unsigned int);
 extern void uart_puts(const char*);
 extern void uart_putx(unsigned int);
-extern unsigned int uart_getc(void);
+extern char uart_getc(void);
 
 int kernel_main(void)
 {

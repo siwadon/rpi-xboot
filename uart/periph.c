@@ -10,7 +10,7 @@ extern void delay(unsigned int);
  * BCM2835 ARM Peripherals
  * https://www.raspberrypi.org/app/uploads/2012/02/BCM2835-ARM-Peripherals.pdf
  *
- * BCM2836 is identical to BCM2835
+ * The underlying architecture in BCM2836 is identical to BCM2835.
  * https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2836/README.md
  */
 
@@ -61,13 +61,19 @@ void uart_init(void)
     ra |= 2 << 15;    // ALT 5
 
     mmio_write(GPFSEL1, ra);
+
+    // Disable pull up/down for all GPIO pins and delay for 150 cycles
     mmio_write(GPPUD, 0);
     delay(150);
 
+    // Disable pull up/down for pin 14, 15 and delay for 150 cycles
     mmio_write(GPPUDCLK0, (1 << 14) | (1 << 15));
     delay(150);
 
+    // Write 0 to GPPUDCLK0 to make it take effect.
     mmio_write(GPPUDCLK0, 0);
+
+    // Enable transmit Auto flow-control using CTS
     mmio_write(AUX_MU_CNTL_REG, 3);
 }
 
