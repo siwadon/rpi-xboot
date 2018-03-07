@@ -7,27 +7,38 @@ extern void mmio_write(unsigned int, unsigned int);
 extern unsigned int mmio_read(unsigned int);
 extern void dummy(unsigned int);
 
-#define ARM_TIMER_CTL (PBASE + 0x0000B408)
-#define ARM_TIMER_CNT (PBASE + 0x0000B420)
+/**
+ * BCM2835 ARM Peripherals
+ * https://www.raspberrypi.org/app/uploads/2012/02/BCM2835-ARM-Peripherals.pdf
+ *
+ * BCM2836 is identical to BCM2835
+ * https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2836/README.md
+ */
 
-#define GPFSEL1 (PBASE + 0x00200004)
-#define GPSET0 (PBASE + 0x0020001C)
-#define GPCLR0 (PBASE + 0x00200028)
-#define GPPUD (PBASE + 0x00200094)
-#define GPPUDCLK0 (PBASE + 0x00200098)
+// Timer registers
+#define ARM_TIMER_CTL   (P_BASE + 0xB408)   // Control
+#define ARM_TIMER_CNT   (P_BASE + 0xB420)   // Free running counter
 
-#define AUX_ENABLES (PBASE + 0x00215004)
-#define AUX_MU_IO_REG (PBASE + 0x00215040)
-#define AUX_MU_IER_REG (PBASE + 0x00215044)
-#define AUX_MU_IIR_REG (PBASE + 0x00215048)
-#define AUX_MU_LCR_REG (PBASE + 0x0021504C)
-#define AUX_MU_MCR_REG (PBASE + 0x00215050)
-#define AUX_MU_LSR_REG (PBASE + 0x00215054)
-#define AUX_MU_MSR_REG (PBASE + 0x00215058)
-#define AUX_MU_SCRATCH (PBASE + 0x0021505C)
-#define AUX_MU_CNTL_REG (PBASE + 0x00215060)
-#define AUX_MU_STAT_REG (PBASE + 0x00215064)
-#define AUX_MU_BAUD_REG (PBASE + 0x00215068)
+// GPIO registers
+#define GPFSEL1         (GPIO_BASE + 0x04)  // GPIO Function Select 1
+#define GPSET0          (GPIO_BASE + 0x1C)  // GPIO Pin Output Set 1
+#define GPCLR0          (GPIO_BASE + 0x28)  // GPIO Pin Output Clear 0
+#define GPPUD           (GPIO_BASE + 0x94)  // GPIO Pin Pull-up/down Enable
+#define GPPUDCLK0       (GPIO_BASE + 0x98)  // GPIO Pin Pull-up/down Enable Clock 0
+
+// Auxilary Mini UART registers
+#define AUX_ENABLES     (UART_BASE + 0x04)  // Auxiliary Enables
+#define AUX_MU_IO_REG   (UART_BASE + 0x40)  // Mini UART I/O Data
+#define AUX_MU_IER_REG  (UART_BASE + 0x44)  // Mini UART Interrupt Enable
+#define AUX_MU_IIR_REG  (UART_BASE + 0x48)  // Mini UART Interrupt Identify
+#define AUX_MU_LCR_REG  (UART_BASE + 0x4C)  // Mini UART Line Control
+#define AUX_MU_MCR_REG  (UART_BASE + 0x50)  // Mini UART Modem Control
+#define AUX_MU_LSR_REG  (UART_BASE + 0x54)  // Mini UART Line Status
+#define AUX_MU_MSR_REG  (UART_BASE + 0x58)  // Mini UART Modem Status
+#define AUX_MU_SCRATCH  (UART_BASE + 0x5C)  // Mini UART Scratch
+#define AUX_MU_CNTL_REG (UART_BASE + 0x60)  // Mini UART Extra Control
+#define AUX_MU_STAT_REG (UART_BASE + 0x64)  // Mini UART Extra Status
+#define AUX_MU_BAUD_REG (UART_BASE + 0x68)  // Mini UART Baudrate
 
 //GPIO14  TXD0 and TXD1
 //GPIO15  RXD0 and RXD1
@@ -74,7 +85,6 @@ void uart_flush(void)
 
 void hexstrings(unsigned int d)
 {
-    //unsigned int ra;
     unsigned int rb;
     unsigned int rc;
 
