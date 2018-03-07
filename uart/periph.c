@@ -95,6 +95,13 @@ void uart_putc(unsigned int c)
     mmio_write(AUX_MU_IO_REG, c);
 }
 
+void uart_puts(const char* str)
+{
+    for (int i = 0; str[i] != '\0'; i++) {
+        uart_putc(str[i]);
+    }
+}
+
 void hexstrings(unsigned int d)
 {
     unsigned int rb;
