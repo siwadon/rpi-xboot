@@ -87,6 +87,7 @@ char uart_getc(void)
     return mmio_read(AUX_MU_IO_REG) & 0xFF;
 }
 
+// Output a character
 void uart_putc(unsigned int c)
 {
     // Wait for UART to become ready to transmit
@@ -95,6 +96,7 @@ void uart_putc(unsigned int c)
     mmio_write(AUX_MU_IO_REG, c);
 }
 
+// Output a string
 void uart_puts(const char* str)
 {
     for (int i = 0; str[i] != '\0'; i++) {
@@ -102,13 +104,14 @@ void uart_puts(const char* str)
     }
 }
 
-void hexstrings(unsigned int d)
+// Output a string for a given hexadecimal number
+void uart_putx(unsigned int d)
 {
     unsigned int rb;
     unsigned int rc;
 
     rb = 32;
-    while (1)
+    while (rb != 0)
     {
         rb -= 4;
         rc = (d >> rb) & 0xF;
@@ -119,17 +122,9 @@ void hexstrings(unsigned int d)
             rc += 0x30;
             
         uart_putc(rc);
-
-        if (rb == 0)
-            break;
     }
 
-    uart_putc(0x20);
-}
-
-void hexstring(unsigned int d)
-{
-    hexstrings(d);
+    uart_putc(0x20); // space
     uart_putc(0x0D); // carriage return
     uart_putc(0x0A); // new line
 }
