@@ -1,6 +1,6 @@
 extern void mmio_write(unsigned int, unsigned int);
 extern unsigned int mmio_read(unsigned int);
-extern unsigned int GETPC(void);
+extern unsigned int get_pc(void);
 
 extern void uart_init(void);
 extern void uart_putc(unsigned int);
@@ -15,7 +15,7 @@ int kernel_main(void)
     uart_puts("Hello, UART\r\n");
     uart_putx(0x12345678);
     uart_putx(0xABCDEF);
-    uart_putx(GETPC());
+    uart_putx(get_pc());
 
     return 0;
 }

@@ -4,10 +4,22 @@ _start:
     bl kernel_main
 hang: b hang
 
-@ Memory-Mapped I/O output
+@ Memory-Mapped I/O output 32-bit
 .globl mmio_write
 mmio_write:
     str r1, [r0]
+    bx lr
+
+@ Memory-Mapped I/O output 16-bit (halfword)
+.globl mmio_write16
+mmio_write16:
+    strh r1, [r0]
+    bx lr
+
+@ Memory-Mapped I/O output 8-bit (byte)
+.globl mmio_write8
+mmio_write8:
+    strb r1, [r0]
     bx lr
 
 @ Memory-Mapped I/O input
@@ -23,12 +35,11 @@ delay:
     bne delay
     bx lr
 
-.globl GETPC
-GETPC:
+.globl get_pc
+get_pc:
     mov r0,lr
     bx lr
 
-
-.globl BRANCHTO
-BRANCHTO:
+.globl branch_to
+branch_to:
     bx r0
