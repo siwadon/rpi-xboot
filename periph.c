@@ -77,11 +77,13 @@ void uart_init(void)
     mmio_write(AUX_MU_CNTL_REG, 3);
 }
 
-int is_uart_data_ready() {
+int is_uart_data_ready()
+{
     return mmio_read(AUX_MU_LSR_REG) & 0x01;
 }
 
-int is_uart_transmitter_ready() {
+int is_uart_transmitter_ready()
+{
     return mmio_read(AUX_MU_LSR_REG) & 0x20;
 }
 
@@ -103,9 +105,10 @@ void uart_putc(unsigned int c)
 }
 
 // Output a string
-void uart_puts(const char* str)
+void uart_puts(const char *str)
 {
-    for (int i = 0; str[i] != '\0'; i++) {
+    for (int i = 0; str[i] != '\0'; i++)
+    {
         uart_putc(str[i]);
     }
 }
@@ -133,6 +136,16 @@ void uart_putx(unsigned int d)
     uart_putc(0x20); // space
     uart_putc(0x0D); // carriage return
     uart_putc(0x0A); // new line
+}
+
+// Flush UART
+void uart_flush(void)
+{
+    while (1)
+    {
+        if ((mmio_read(AUX_MU_LSR_REG) & 0x100) == 0)
+            break;
+    }
 }
 
 void timer_init(void)
