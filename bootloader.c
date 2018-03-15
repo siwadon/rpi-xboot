@@ -1,28 +1,23 @@
-// The Raspberry Pi firmware at the time this was written defaults
-// loading at address 0x8000.  Although this bootloader could easily
-// load at 0x0000, it loads at 0x8000 so that the same binaries built
-// for the SD card work with this bootloader.  Change the ARMBASE
-// below to use a different location.
+// The Raspberry Pi firmware at the time this was written defaults loading at address 0x8000.
+// Although this bootloader could easily load at 0x0000, it loads at 0x8000
+// so that the same binaries built for the SD card work with this bootloader.
+// Change the ARMBASE below to use a different location.
 
 #define ARMBASE 0x8000
 
-extern void PUT32(unsigned int, unsigned int);
-extern void PUT16(unsigned int, unsigned int);
-extern void PUT8(unsigned int, unsigned int);
-extern unsigned int GET32(unsigned int);
-extern unsigned int GETPC(void);
-extern void BRANCHTO(unsigned int);
-extern void dummy(unsigned int);
+extern void mmio_write8(unsigned int, unsigned int);
+extern unsigned int mmio_read(unsigned int);
+extern unsigned int get_pc(void);
+extern void branch_to(unsigned int);
+extern void delay(unsigned int);
 
 extern void uart_init(void);
-extern unsigned int uart_lcr(void);
 extern void uart_flush(void);
-extern void uart_send(unsigned int);
-extern unsigned int uart_recv(void);
-extern void hexstring(unsigned int);
-extern void hexstrings(unsigned int);
-extern void timer_init(void);
-extern unsigned int timer_tick(void);
+extern void uart_putc(unsigned int);
+extern void uart_putx(unsigned int);
+extern unsigned int uart_getc(void);
+extern unsigned int uart_lcr(void);
+extern int is_uart_data_ready(void);
 
 extern void timer_init(void);
 extern unsigned int timer_tick(void);
@@ -61,36 +56,37 @@ int kernel_main(void)
     state = 0;
     crc = 0;
     rx = timer_tick();
+
     while (1)
     {
         ra = timer_tick();
 
         if ((ra - rx) >= 4000000)
         {
-            uart_send(0x15);
+            uart_putc(0x15);
             rx += 4000000;
         }
 
-        if ((uart_lcr() & 0x01) == 0)
+        if (is_uart_data_ready() == 0)
             continue;
 
-        xstring[state] = uart_recv();
+        xstring[state] = uart_getc();
         rx = timer_tick();
         
         if (state == 0)
         {
             if (xstring[state] == 0x04)
             {
-                uart_send(0x06);
+                uart_putc(0x06);
 
                 for (ra = 0; ra < 30; ra++)
-                    hexstring(ra);
+                    uart_putx(ra);
 
-                hexstring(0x11111111);
-                hexstring(0x22222222);
-                hexstring(0x33333333);
+                uart_putx(0x11111111);
+                uart_putx(0x22222222);
+                uart_putx(0x33333333);
                 uart_flush();
-                BRANCHTO(ARMBASE);
+                branch_to(ARMBASE);
                 break;
             }
         }
@@ -106,8 +102,7 @@ int kernel_main(void)
             }
             else
             {
-                //state=0;
-                uart_send(0x15);
+                uart_putc(0x15);
             }
             break;
         }
@@ -121,7 +116,7 @@ int kernel_main(void)
             else
             {
                 state = 0;
-                uart_send(0x15);
+                uart_putc(0x15);
             }
             break;
         }
@@ -134,7 +129,7 @@ int kernel_main(void)
             }
             else
             {
-                uart_send(0x15);
+                uart_putc(0x15);
                 state = 0;
             }
             break;
@@ -146,14 +141,14 @@ int kernel_main(void)
             {
                 for (ra = 0; ra < 128; ra++)
                 {
-                    PUT8(addr++, xstring[ra + 3]);
+                    mmio_write8(addr++, xstring[ra + 3]);
                 }
-                uart_send(0x06);
+                uart_putc(0x06);
                 block = (block + 1) & 0xFF;
             }
             else
             {
-                uart_send(0x15);
+                uart_putc(0x15);
             }
             state = 0;
             break;
@@ -166,5 +161,6 @@ int kernel_main(void)
         }
         }
     }
-    return (0);
+
+    return 0;
 }
