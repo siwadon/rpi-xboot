@@ -1,3 +1,5 @@
+#include "xmodem.h"
+
 // The Raspberry Pi firmware at the time this was written defaults loading at address 0x8000.
 // Although this bootloader could easily load at 0x0000, it loads at 0x8000
 // so that the same binaries built for the SD card work with this bootloader.
@@ -16,150 +18,154 @@ extern void uart_flush(void);
 extern void uart_putc(unsigned int);
 extern void uart_putx(unsigned int);
 extern unsigned int uart_getc(void);
-extern unsigned int uart_lcr(void);
 extern int is_uart_data_ready(void);
 
 extern void timer_init(void);
 extern unsigned int timer_tick(void);
 
-unsigned char xstring[256];
+void xmodem_packet_init(struct xmodem_packet *packet)
+{
+    packet->addr = ARMBASE;
+    packet->number = 1;
+    packet->byte = 0;
+    packet->crc = 0;
+}
+
+void add_checksum_byte(struct xmodem_packet *packet)
+{
+    packet->crc += packet->bytes[packet->byte];
+    packet->byte++;
+}
+
+/* 
+XMODEM packet format
+132 bytes packet containing 128 bytes of data
+
+1:       SOH
+2:       packet number (0 - 255)
+3:       1s' complement of the packet number (255 - packet number)
+4-131:   packet data
+132-133: checksum, the sum of all of the bytes in the packet mod 256
+*/
+void process_byte(struct xmodem_packet *packet)
+{
+    int i;
+    int expect_byte = packet->bytes[packet->byte];
+
+    switch (packet->byte)
+    {
+    case 0:
+    {
+        if (expect_byte == SOH)
+        {
+            add_checksum_byte(packet);
+        }
+        else
+        {
+            uart_putc(NAK);
+        }
+
+        break;
+    }
+    case 1:
+    {
+        if (expect_byte == packet->number)
+        {
+            add_checksum_byte(packet);
+        }
+        else
+        {
+            uart_putc(NAK);
+            packet->byte = 0;
+        }
+
+        break;
+    }
+    case 2:
+    {
+        if (expect_byte == (255 - packet->bytes[1]))
+        {
+            add_checksum_byte(packet);
+        }
+        else
+        {
+            uart_putc(NAK);
+            packet->byte = 0;
+        }
+
+        break;
+    }
+    case 131:
+    {
+        if (expect_byte == (packet->crc % 256))
+        {
+            for (i = 0; i < 128; i++)
+            {
+                mmio_write8(packet->addr++, packet->bytes[i + 3]);
+            }
+            uart_putc(ACK);
+            packet->crc = 0;
+            packet->number = (packet->number + 1) % 256;
+        }
+        else
+        {
+            uart_putc(NAK);
+        }
+
+        packet->byte = 0;
+        break;
+    }
+    default:
+    {
+        add_checksum_byte(packet);
+        break;
+    }
+    }
+}
+
+void read_byte(struct xmodem_packet *packet)
+{
+    packet->bytes[packet->byte] = uart_getc();
+    
+    if (packet->byte == 0 && packet->bytes[packet->byte] == EOT)
+    {
+        uart_putc(ACK);
+        uart_flush();
+        delay(10000000);
+        branch_to(ARMBASE);
+    }
+
+    process_byte(packet);
+}
 
 int kernel_main(void)
 {
-    unsigned int ra;
-    unsigned int rx;
-    unsigned int addr;
-    unsigned int block;
-    unsigned int state;
-    unsigned int crc;
+    struct xmodem_packet packet;
+    unsigned int tx;
+    unsigned int ty;
 
     uart_init();
     timer_init();
-
-    // SOH 0x01
-    // ACK 0x06
-    // NAK 0x15
-    // EOT 0x04
-
-    // block numbers start with 1
-
-    // 132 byte packet
-    // starts with SOH
-    // block number byte
-    // 255-block number
-    // 128 bytes of data
-    // checksum byte (whole packet)
-    // a single EOT instead of SOH when done, send an ACK on it too
-
-    block = 1;
-    addr = ARMBASE;
-    state = 0;
-    crc = 0;
-    rx = timer_tick();
+    xmodem_packet_init(&packet);
+    tx = timer_tick();
 
     while (1)
     {
-        ra = timer_tick();
+        ty = timer_tick();
 
-        if ((ra - rx) >= 4000000)
+        if ((ty - tx) >= 4000000)
         {
-            uart_putc(0x15);
-            rx += 4000000;
+            uart_putc(NAK);
+            tx += 4000000;
         }
 
         if (is_uart_data_ready() == 0)
+        {
             continue;
-
-        xstring[state] = uart_getc();
-        rx = timer_tick();
-        
-        if (state == 0)
-        {
-            if (xstring[state] == 0x04)
-            {
-                uart_putc(0x06);
-
-                for (ra = 0; ra < 30; ra++)
-                    uart_putx(ra);
-
-                uart_putx(0x11111111);
-                uart_putx(0x22222222);
-                uart_putx(0x33333333);
-                uart_flush();
-                branch_to(ARMBASE);
-                break;
-            }
         }
 
-        switch (state)
-        {
-        case 0:
-        {
-            if (xstring[state] == 0x01)
-            {
-                crc = xstring[state];
-                state++;
-            }
-            else
-            {
-                uart_putc(0x15);
-            }
-            break;
-        }
-        case 1:
-        {
-            if (xstring[state] == block)
-            {
-                crc += xstring[state];
-                state++;
-            }
-            else
-            {
-                state = 0;
-                uart_putc(0x15);
-            }
-            break;
-        }
-        case 2:
-        {
-            if (xstring[state] == (0xFF - xstring[state - 1]))
-            {
-                crc += xstring[state];
-                state++;
-            }
-            else
-            {
-                uart_putc(0x15);
-                state = 0;
-            }
-            break;
-        }
-        case 131:
-        {
-            crc &= 0xFF;
-            if (xstring[state] == crc)
-            {
-                for (ra = 0; ra < 128; ra++)
-                {
-                    mmio_write8(addr++, xstring[ra + 3]);
-                }
-                uart_putc(0x06);
-                block = (block + 1) & 0xFF;
-            }
-            else
-            {
-                uart_putc(0x15);
-            }
-            state = 0;
-            break;
-        }
-        default:
-        {
-            crc += xstring[state];
-            state++;
-            break;
-        }
-        }
+        read_byte(&packet);
+        tx = timer_tick();
     }
 
     return 0;
