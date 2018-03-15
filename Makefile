@@ -2,7 +2,7 @@ ARMGNU ?= arm-none-eabi
 
 COPS = -Wall -O2 -nostdlib -nostartfiles -ffreestanding 
 
-gcc : uart.bin
+gcc : uart.bin bootloader.bin
 
 all : gcc clang
 
@@ -27,10 +27,17 @@ periph.o : periph.c
 
 uart.bin : memmap start.o periph.o uart.o 
 	$(ARMGNU)-ld start.o periph.o uart.o -T memmap -o uart.elf
-	$(ARMGNU)-objdump -D uart.elf > uart.list
-	$(ARMGNU)-objcopy uart.elf -O ihex uart.hex
 	$(ARMGNU)-objcopy uart.elf -O binary uart.bin
 
+vectors.o : vectors.s
+	$(ARMGNU)-as vectors.s -o vectors.o
+
+bootloader.o : bootloader.c
+	$(ARMGNU)-gcc $(COPS) -c bootloader.c -o bootloader.o
+
+bootloader.bin : loader vectors.o periph.o bootloader.o
+	$(ARMGNU)-ld vectors.o periph.o bootloader.o -T loader -o bootloader.elf
+	$(ARMGNU)-objcopy bootloader.elf -O binary bootloader.bin
 
 
 LOPS = -Wall -m32 -emit-llvm
