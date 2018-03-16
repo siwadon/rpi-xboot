@@ -16,8 +16,8 @@ clean :
 	rm -f *.bc
 	rm -f *.clang.s
 
-start.o : start.s
-	$(ARMGNU)-as start.s -o start.o
+start_uart.o : start_uart.s
+	$(ARMGNU)-as start_uart.s -o start_uart.o
 
 uart.o : uart.c
 	$(ARMGNU)-gcc $(COPS) -c uart.c -o uart.o
@@ -25,18 +25,18 @@ uart.o : uart.c
 periph.o : periph.c
 	$(ARMGNU)-gcc $(COPS) -c periph.c -o periph.o
 
-uart.bin : memmap start.o periph.o uart.o 
-	$(ARMGNU)-ld start.o periph.o uart.o -T memmap -o uart.elf
+uart.bin : memmap start_uart.o periph.o uart.o 
+	$(ARMGNU)-ld start_uart.o periph.o uart.o -T memmap -o uart.elf
 	$(ARMGNU)-objcopy uart.elf -O binary uart.bin
 
-vectors.o : vectors.s
-	$(ARMGNU)-as vectors.s -o vectors.o
+start_bootloader.o : start_bootloader.s
+	$(ARMGNU)-as start_bootloader.s -o start_bootloader.o
 
 bootloader.o : bootloader.c
 	$(ARMGNU)-gcc $(COPS) -c bootloader.c -o bootloader.o
 
-bootloader.bin : loader vectors.o periph.o bootloader.o
-	$(ARMGNU)-ld vectors.o periph.o bootloader.o -T loader -o bootloader.elf
+bootloader.bin : loader start_bootloader.o periph.o bootloader.o
+	$(ARMGNU)-ld start_bootloader.o periph.o bootloader.o -T loader -o bootloader.elf
 	$(ARMGNU)-objcopy bootloader.elf -O binary bootloader.bin
 
 
@@ -55,12 +55,12 @@ uart.bc : uart.c
 periph.bc : periph.c
 	clang $(LOPS) -c periph.c -o periph.bc
 
-uart.clang.elf : memmap start.o uart.bc periph.bc
+uart.clang.elf : memmap start_uart.o uart.bc periph.bc
 	llvm-link periph.bc uart.bc -o uart.nopt.bc
 	opt $(OOPS) uart.nopt.bc -o uart.opt.bc
 	llc $(LLCOPS) uart.opt.bc -o uart.clang.s
 	$(ARMGNU)-as uart.clang.s -o uart.clang.o
-	$(ARMGNU)-ld -o uart.clang.elf -T memmap start.o uart.clang.o
+	$(ARMGNU)-ld -o uart.clang.elf -T memmap start_uart.o uart.clang.o
 	$(ARMGNU)-objdump -D uart.clang.elf > uart.clang.list
 
 uart.clang.bin : uart.clang.elf
