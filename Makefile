@@ -35,8 +35,8 @@ start_bootloader.o : start_bootloader.s
 bootloader.o : bootloader.c
 	$(ARMGNU)-gcc $(COPS) -c bootloader.c -o bootloader.o
 
-bootloader.bin : loader.ld start_bootloader.o periph.o bootloader.o
-	$(ARMGNU)-ld start_bootloader.o periph.o bootloader.o -T loader.ld -o bootloader.elf
+bootloader.bin : bootloader.ld start_bootloader.o periph.o bootloader.o
+	$(ARMGNU)-ld start_bootloader.o periph.o bootloader.o -T bootloader.ld -o bootloader.elf
 	$(ARMGNU)-objcopy bootloader.elf -O binary bootloader.bin
 
 
