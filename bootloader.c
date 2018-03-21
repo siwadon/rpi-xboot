@@ -44,8 +44,8 @@ XMODEM packet format
 1:       SOH
 2:       packet number (0 - 255)
 3:       1s' complement of the packet number (255 - packet number)
-4-131:   packet data
-132-133: checksum, the sum of all of the bytes in the packet mod 256
+4-130:   packet data
+131-132: checksum, the sum of all of the bytes in the packet mod 256
 */
 void process_byte(struct xmodem_packet *packet)
 {
