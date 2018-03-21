@@ -1,12 +1,35 @@
 .globl _start
 
+@ Reserves the given number of bytes. The bytes are filled with zero
+.space 0x200000-0x0000, 0
+
 _start:
-    b skip
+    b loader_start
+    b loader_sleep  // undefined
+    b loader_sleep  // svc
+    b loader_sleep  // prefetch
+    b loader_sleep  // abort
+    b loader_sleep  // hypervisor
+    b loader_sleep  // irq
+    b loader_sleep  // fiq
 
-.space 0x200000-0x8004, 0
+loader_sleep:
+    wfi
+    b loader_sleep
 
-skip:
-    mov sp,#0x08000000
+loader_start:
+    // Switch to SVC mode, all interrupts disabled
+    .set PSR_MODE_SVC, 0x13
+    .set PSR_MODE_IRQ_DISABLED, (1<<7)
+    .set PSR_MODE_FIQ_DISABLED, (1<<6)
+    msr cpsr_c, #(PSR_MODE_SVC + PSR_MODE_FIQ_DISABLED + PSR_MODE_IRQ_DISABLED)
+
+    // Set all CPUs to wait except the primary CPU
+    mrc p15, 0, r0, c0, c0, 5
+    ands r0, r0, #0x03
+    bne loader_sleep
+
+    mov sp, #0x08000000
     bl kernel_main
 
 hang: b hang
