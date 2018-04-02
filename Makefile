@@ -27,6 +27,7 @@ periph.o : periph.c
 
 uart.bin : uart.ld start_uart.o periph.o uart.o 
 	$(ARMGNU)-ld start_uart.o periph.o uart.o -T uart.ld -o uart.elf
+	$(ARMGNU)-objdump uart.elf -D > uart.list
 	$(ARMGNU)-objcopy uart.elf -O binary uart.bin
 
 start_bootloader.o : start_bootloader.s
@@ -37,6 +38,7 @@ bootloader.o : bootloader.c
 
 bootloader.bin : bootloader.ld start_bootloader.o periph.o bootloader.o
 	$(ARMGNU)-ld start_bootloader.o periph.o bootloader.o -T bootloader.ld -o bootloader.elf
+	$(ARMGNU)-objdump bootloader.elf -D > bootloader.list
 	$(ARMGNU)-objcopy bootloader.elf -O binary bootloader.bin
 
 
