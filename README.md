@@ -31,7 +31,7 @@ $ pip3 install serial xmodem
 $ make
 ```
 
-3. Download files or flash your sd card with Raspbian (and skip to the next step) 
+3. Download boot files or flash your sd card with Raspbian (and skip to the next step) 
 ```
 $ curl -O https://github.com/raspberrypi/firmware/raw/master/boot/start.elf
 
@@ -53,8 +53,13 @@ disable_commandline_tags=1
 enable_uart=1
 ```
 
-After the steps above, we can now test it with the simple uart program
+Before we can test it, please connect your serial cable to your RPi to [pin 6, 8 and 10](https://pinout.xyz/pinout/uart) like this
+![https://elinux.org/RPi_Serial_Connection](serial-cable.jpg)
+
+Now we can test it with our simple uart program
 
 ```bash
 $ python3 rpi-install.py /dev/cu.usbserial uart.bin && kermit
 ```
+
+You should see `Hello, UART` on your screen!
