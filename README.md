@@ -31,7 +31,7 @@ $ pip3 install serial xmodem
 $ make
 ```
 
-3. Download boot files or flash your sd card with Raspbian (and skip to the next step) 
+3. Download boot files (or flash your sd card with Raspbian and skip to the next step) 
 ```
 $ curl -O https://github.com/raspberrypi/firmware/raw/master/boot/start.elf
 
@@ -53,7 +53,7 @@ disable_commandline_tags=1
 enable_uart=1
 ```
 
-Before we can test it, please connect your serial cable to your RPi to [pin 6, 8 and 10](https://pinout.xyz/pinout/uart) like this
+Before we can test it, please connect your serial cable to [pin 6, 8 and 10](https://pinout.xyz/pinout/uart) of your RPi like this
 ![https://elinux.org/RPi_Serial_Connection](serial-cable.jpg)
 
 Now we can test it with our simple uart program
@@ -63,3 +63,10 @@ $ python3 rpi-install.py /dev/cu.usbserial uart.bin && kermit
 ```
 
 You should see `Hello, UART` on your screen!
+
+To run [xv6](https://github.com/zhiyihuang/xv6_rpi2_port), you just need to clone the repository and update the location of the TOOLCHAIN in the [Makefile](https://github.com/zhiyihuang/xv6_rpi2_port/blob/master/Makefile#L6) and run
+
+```bash
+$ make loader
+$ python3 rpi-install.py /dev/cu.usbserial kernel7.img && kermit
+```
