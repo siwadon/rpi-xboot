@@ -23,7 +23,7 @@ This repository contains the XMODEM-based boot loader that allows us to send a b
 
 1. Install required python packages
 ```
-$ pip3 install serial xmodem
+$ pip3 install pyserial xmodem
 ```
 
 2. Build the bootloader and the simple uart program
