@@ -22,7 +22,7 @@ Dependencies:
 
 """
 from __future__ import print_function
-import argparse, logging, os, serial, sys, time
+import argparse, io, logging, lzma, os, serial, sys, time
 from serial.tools import list_ports
 from xmodem import XMODEM
 
@@ -123,10 +123,13 @@ your Pi plugged in?
     hanging onto that port?
     """)
 
-    stream = args.file
-    printq("Sending `%s` (%d bytes): " % (stream.name, os.stat(stream.name).st_size), end='')
+    compressed = lzma.compress(args.file.read(), lzma.FORMAT_ALONE)
+    file_size = len(compressed)
+    stream = io.BytesIO(compressed)
+    printq("Sending compressed `%s` (%d bytes): " % (args.file.name, file_size), end='')
 
     success = False
+
     def getc(size, timeout=1):
         ch = port.read(size)
         # echo 'x' to report failure if read timed out/failed
