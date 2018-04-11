@@ -128,6 +128,8 @@ your Pi plugged in?
     stream = io.BytesIO(compressed)
     printq("Sending compressed `%s` (%d bytes): " % (args.file.name, file_size), end='')
 
+    max_iter = file_size / 128;
+    current_iter = max_iter;
     success = False
 
     def getc(size, timeout=1):
@@ -139,12 +141,16 @@ your Pi plugged in?
         return ch
 
     def putc(data, timeout=1):
+        global current_iter
         n = port.write(data)
-        # echo '.' to report full packet successfully sent
+        # update progress after full packet successfully sent
         if n >= 128:
-            printq('.', end='')
+            current_iter -= 1
+            sys.stdout.write("\r%d%%" % ((max_iter - current_iter)/max_iter * 100))
+            sys.stdout.flush()
 
     try:
+        print()
         xmodem = XMODEM(getc, putc)
         success = xmodem.send(stream, retry=5)
         if not success:
