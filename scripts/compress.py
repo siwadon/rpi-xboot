@@ -13,4 +13,4 @@ bytes = read_bytes(sys.argv[1])
 
 data_out = lzma.compress(bytes, lzma.FORMAT_ALONE)
 
-sys.stdout.buffer.write(data_out);
+sys.stdout.buffer.write(data_out)

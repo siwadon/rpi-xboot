@@ -94,14 +94,12 @@ static SRes Decode2(CLzmaDec *state, ISeqOutStream *outStream, ISeqInStream *inS
         finishMode = LZMA_FINISH_END;
       }
       
-      printf("srcLen  = %lu\n", inProcessed);
       printf("destLen = %lu\n", outProcessed);
       res = LzmaDec_DecodeToBuf(state, outBuf + outPos, &outProcessed,
         inBuf + inPos, &inProcessed, finishMode, &status);
 
-      printf("status  = %d\n", res);
-      printf("srcLen  = %lu\n", inProcessed);
       printf("destLen = %lu\n\n", outProcessed);
+      printf("status  = %s\n", res ? "ERROR" : "OK");
 
       inPos += inProcessed;
       outPos += outProcessed;
@@ -141,21 +139,17 @@ static SRes DecodeSingleCall(ISeqInStream *inStream, ISeqOutStream *outStream, u
   size_t inSize = IN_BUF_SIZE;
   size_t outSize = sizeUnknown ? OUT_BUF_SIZE : unpackSize;
 
-  printf("inSize = %lu (before read)\n", inSize);
   RINOK(inStream->Read(inStream, inBuf, &inSize));
-  printf("inSize = %lu (after read)\n\n", inSize);
 
-  printf("srcLen  = %lu\n", inSize);
-  printf("destLen = %lu\n", outSize);
+  printf("destLen = %lu (before decompress)\n", outSize);
 
   res = LzmaDecode(outBuf, &outSize, inBuf, &inSize,
     header, LZMA_PROPS_SIZE, finishMode,
     &status, &g_Alloc);
 
   outStream->Write(outStream, outBuf, outSize);
-  printf("status  = %d\n", res);
-  printf("srcLen  = %lu\n", inSize);
-  printf("destLen = %lu\n", outSize);
+  printf("destLen = %lu (after decompress)\n", outSize);
+  printf("status  = %s\n", res ? "ERROR" : "OK");
 
   HexDump(outBuf);
 
@@ -185,10 +179,6 @@ static SRes Decode(ISeqOutStream *outStream, ISeqInStream *inStream)
   LzmaDec_Construct(&state);
   RINOK(LzmaDec_Allocate(&state, header, LZMA_PROPS_SIZE, &g_Alloc));
 
-  // printf("\n====== Multi-call ====== \n");
-  // res = Decode2(&state, outStream, inStream, unpackSize);
-
-  printf("\n====== Single-call ====== \n");
   res = DecodeSingleCall(inStream, outStream, header, unpackSize);
   LzmaDec_Free(&state, &g_Alloc);
   return res;
