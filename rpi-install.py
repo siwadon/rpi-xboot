@@ -146,7 +146,16 @@ your Pi plugged in?
         # update progress after full packet successfully sent
         if n >= 128:
             current_iter -= 1
-            sys.stdout.write("\r%d%%" % ((max_iter - current_iter)/max_iter * 100))
+            percent = (max_iter - current_iter) / max_iter * 100
+            bars = '=' * int(percent / 2)
+            if percent >= 99:
+                spaces = ' ' * int((100-percent) / 2)
+                arrow = ''
+            else:
+                spaces = ' ' * (int((100-percent) / 2) - 1)
+                arrow = '>'
+                
+            sys.stdout.write("\r%d%% [%s%s%s]" % (percent, bars, arrow, spaces) )
             sys.stdout.flush()
 
     try:
