@@ -113,6 +113,12 @@ void uart_puts(const char *str)
     }
 }
 
+void uart_put_newline() {
+    uart_putc(0x20); // space
+    uart_putc(0x0D); // carriage return
+    uart_putc(0x0A); // new line
+}
+
 // Output a string for a given hexadecimal number
 void uart_putx(unsigned int d)
 {
@@ -133,9 +139,7 @@ void uart_putx(unsigned int d)
         uart_putc(rc);
     }
 
-    uart_putc(0x20); // space
-    uart_putc(0x0D); // carriage return
-    uart_putc(0x0A); // new line
+    uart_put_newline();
 }
 
 // Flush UART

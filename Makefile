@@ -38,9 +38,17 @@ OBJS = \
   LzmaDec.o \
   7zFile.o \
   7zStream.o \
+	lzma.o \
+	xmodem.o \
 	bootloader.o \
 
+xmodem.o : xmodem.c
+	$(ARMGNU)-gcc $(COPS) -c xmodem.c
+
 # LZMA
+lzma.o : lzma.c
+	$(ARMGNU)-gcc $(COPS) -c lzma.c
+
 7zFile.o: lib/lzma/7zFile.c
 	$(ARMGNU)-gcc $(LZFLAGS) -c lib/lzma/7zFile.c
 
@@ -52,6 +60,7 @@ Alloc.o: lib/lzma/Alloc.c
 
 LzmaDec.o: lib/lzma/LzmaDec.c
 	$(ARMGNU)-gcc $(LZFLAGS) -c lib/lzma/LzmaDec.c
+
 
 # Boot loader
 start_bootloader.o : start_bootloader.s
