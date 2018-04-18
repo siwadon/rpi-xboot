@@ -10,5 +10,6 @@ struct xmodem_packet
     unsigned int addr;
     unsigned int number;
     unsigned int byte;
+    unsigned int size;
     unsigned int crc;
 };
