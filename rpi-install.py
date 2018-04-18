@@ -56,8 +56,6 @@ if __name__ == "__main__":
                         action="store_true")
     parser.add_argument('-q', help="do not print while uploading",
                         action="store_true")
-    parser.add_argument('-z', help="compress input file",
-                        action="store_true")
     parser.add_argument('-t', help="timeout for -p",
                         action="store", type=int, default=-1)
 
@@ -123,17 +121,11 @@ your Pi plugged in?
     hanging onto that port?
     """)
 
-    if args.z:
-        compressed = lzma.compress(args.file.read(), lzma.FORMAT_ALONE)
-        file_size = len(compressed)
-        stream = io.BytesIO(compressed)
-        description = 'compressed'
-    else:
-        stream = args.file
-        file_size = os.stat(stream.name).st_size
-        description = 'uncompressed'
+    compressed = lzma.compress(args.file.read(), lzma.FORMAT_ALONE)
+    file_size = len(compressed)
+    stream = io.BytesIO(compressed)
 
-    printq("Sending %s `%s` (%d bytes): " % (description, args.file.name, file_size), end='')
+    printq("Sending compressed `%s` (%d bytes): " % (args.file.name, file_size), end='')
 
     max_iter = file_size / 128
     current_iter = max_iter

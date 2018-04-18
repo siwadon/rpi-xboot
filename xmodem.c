@@ -6,13 +6,11 @@ extern void uart_flush(void);
 extern unsigned int uart_getc(void);
 extern void delay(unsigned int);
 
-void xmodem_packet_init(struct xmodem_packet *packet, unsigned int output_base, unsigned int output_base2)
+void xmodem_packet_init(struct xmodem_packet *packet, unsigned int output_base)
 {
     packet->addr = output_base;
-    packet->addr2 = output_base2;
     packet->number = 1;
     packet->byte = 0;
-    packet->size = 0;
     packet->crc = 0;
 }
 
@@ -87,13 +85,10 @@ void process_byte(struct xmodem_packet *packet)
             for (i = 0; i < 128; i++)
             {
                 mmio_write8(packet->addr++, packet->bytes[i + 3]);
-                // TODO: Remove this after finish LZMA
-                mmio_write8(packet->addr2++, packet->bytes[i + 3]);
             }
             uart_putc(ACK);
             packet->crc = 0;
             packet->number = (packet->number + 1) % 256;
-            // TODO: Correct file size, might need to implement YMODEM or ZMODEM
         }
         else
         {

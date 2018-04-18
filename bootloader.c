@@ -36,7 +36,7 @@ int kernel_main(void)
 
     uart_init();
     timer_init();
-    xmodem_packet_init(&packet, BUFFER_BASE, ARM_BASE);
+    xmodem_packet_init(&packet, BUFFER_BASE);
     tx = timer_tick();
 
     while (1)
@@ -65,37 +65,14 @@ int kernel_main(void)
 
     delay(5000000);
 
-    // TODO: uart_puts() stops working
-    uart_putc('D');
-    uart_putc('e');
-    uart_putc('c');
-    uart_putc('o');
-    uart_putc('m');
-    uart_putc('p');
-    uart_putc('r');
-    uart_putc('e');
-    uart_putc('s');
-    uart_putc('s');
-    uart_putc('?');
-    uart_putc(' ');
-    uart_putc('[');
-    uart_putc('y');
-    uart_putc('/');
-    uart_putc('N');
-    uart_putc(']');
-    uart_putc(' ');
+    uart_puts("Decompressing..\r\n");
+    res = decode(BUFFER_BASE, ARM_BASE, IN_BUF_SIZE);
 
-    char key = uart_getc();
+    uart_puts(res == 0 ? "Done" : "Error");
+    uart_put_newline();
+    uart_put_newline();
 
-    if (key == 'Y' || key == 'y') {
-        uart_put_newline();
-        // not yet working, it stops in the middle
-        res = decode(BUFFER_BASE, ARM_BASE, IN_BUF_SIZE);
-        uart_putc(res == 0 ? '0' : '?');
-
-    } else {
-        uart_put_newline();
-    }
+    delay(1000000);
 
     branch_to(ARM_BASE);
 
