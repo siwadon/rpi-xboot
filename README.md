@@ -22,51 +22,55 @@ This repository contains the XMODEM-based boot loader that allows us to send a b
 ### Bootloader Setup
 
 1. Install required python packages
-```
-$ pip3 install pyserial xmodem
-```
-
-2. Build the bootloader and the simple uart program
-```
-$ make
+```bash
+pip3 install pyserial xmodem
 ```
 
-3. Download boot files (or flash your sd card with Raspbian and skip to the next step) 
-```
-$ curl -O https://github.com/raspberrypi/firmware/raw/master/boot/start.elf
+2. Download necessary boot files `bootcode.bin`, `start.elf`, `fixup.dat` to your SD card ([info](https://elinux.org/RPi_Software))
+```bash
+curl -O https://github.com/raspberrypi/firmware/raw/master/boot/{bootcode.bin,start.elf,fixup.dat}
 
-$ curl -O https://github.com/raspberrypi/firmware/raw/master/boot/bootcode.bin
-
-# copy to the SD card
-$ cp start.elf bootcode.bin /Volumes/boot/
+cp bootcode.bin start.elf fixup.dat /Volumes/boot/
 ```
 
-5. Copy bootloader.bin to the SD card with the name kernel7.img
-```
-$ cp bootloader.bin /Volumes/boot/kernel7.img
+3. Build the bootloader and the simple uart program
+```bash
+make
 ```
 
-6. Make sure you have config.txt in the SD card with these lines
+4. Copy `bootloader.bin` to the SD card with the name `kernel7.img`
+```bash
+cp bootloader.bin /Volumes/boot/kernel7.img
 ```
+
+5. Create `config.txt` in the SD card with these lines
+```bash
 kernel_old=1
 disable_commandline_tags=1
 enable_uart=1
+
 ```
 
 Before we can test it, please connect your serial cable to [pin 6, 8 and 10](https://pinout.xyz/pinout/uart) of your RPi like this
-![https://elinux.org/RPi_Serial_Connection](serial-cable.jpg)
+
+| ![](serial-cable.jpg) | 
+|:--:| 
+| *RPi Serial Connection https://elinux.org/RPi_Serial_Connection* |
 
 Now we can test it with our simple uart program
 
 ```bash
-$ python3 rpi-install.py /dev/cu.usbserial uart.bin && kermit
+python3 rpi-install.py /dev/cu.usbserial uart.bin && kermit
 ```
 
 You should see `Hello, UART` on your screen!
 
+
+### xv6
+
 To run [xv6](https://github.com/zhiyihuang/xv6_rpi2_port), you just need to clone the repository and update the location of the TOOLCHAIN in the [Makefile](https://github.com/zhiyihuang/xv6_rpi2_port/blob/master/Makefile#L6) and run
 
 ```bash
-$ make loader
-$ python3 rpi-install.py /dev/cu.usbserial kernel7.img && kermit
+make loader
+python3 rpi-install.py /dev/cu.usbserial kernel7.img && kermit
 ```
