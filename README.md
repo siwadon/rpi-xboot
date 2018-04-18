@@ -2,6 +2,8 @@
 
 This repository contains the XMODEM-based boot loader that allows us to send a binary image to execute on Raspberry Pi.
 
+![](images/xv6.gif)
+
 ### What you need
 
 #### Hardware
@@ -53,7 +55,7 @@ enable_uart=1
 
 Before we can test it, please connect your serial cable to [pin 6, 8 and 10](https://pinout.xyz/pinout/uart) of your RPi like this
 
-| ![](serial-cable.jpg) | 
+| ![](images/serial-cable.jpg) | 
 |:--:| 
 | *RPi Serial Connection https://elinux.org/RPi_Serial_Connection* |
 
