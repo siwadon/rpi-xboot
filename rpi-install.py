@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
-"""Julie Zelenski 2017.
-Based on earlier rpi-install.py by Pat Hanrahan.
-Edited by Omar Rizwan 2017-04-23.
+"""
+Originally from https://github.com/cs107e/cs107e.github.io/blob/master/cs107e/bin/rpi-install.py
+by Pat Hanrahan, Julie Zelenski, Omar Rizwan
 
-This bootloader client is used to upload binary image to execute on
-Raspberry Pi.
+This bootloader client is used to upload binary image to execute on Raspberry Pi.
 
 Communicates over serial port using xmodem protocol.
 
@@ -26,8 +25,7 @@ import argparse, io, logging, lzma, os, serial, sys, time
 from serial.tools import list_ports
 from xmodem import XMODEM
 
-# Updated during winter quarter 2017-18
-VERSION = "0.91"
+VERSION = "1.1"
 
 # From https://stackoverflow.com/questions/287871/print-in-terminal-with-colors-using-python
 # Plus Julie's suggestion to push bold and color together.
@@ -57,6 +55,8 @@ if __name__ == "__main__":
     parser.add_argument('-v', help="verbose logging of serial activity",
                         action="store_true")
     parser.add_argument('-q', help="do not print while uploading",
+                        action="store_true")
+    parser.add_argument('-z', help="compress input file",
                         action="store_true")
     parser.add_argument('-t', help="timeout for -p",
                         action="store", type=int, default=-1)
@@ -123,13 +123,18 @@ your Pi plugged in?
     hanging onto that port?
     """)
 
-    compressed = lzma.compress(args.file.read(), lzma.FORMAT_ALONE)
-    file_size = len(compressed)
-    stream = io.BytesIO(compressed)
+    if args.z:
+        compressed = lzma.compress(args.file.read(), lzma.FORMAT_ALONE)
+        file_size = len(compressed)
+        stream = io.BytesIO(compressed)
+    else:
+        stream = args.file
+        file_size = os.stat(stream.name).st_size
+
     printq("Sending compressed `%s` (%d bytes): " % (args.file.name, file_size), end='')
 
-    max_iter = file_size / 128;
-    current_iter = max_iter;
+    max_iter = file_size / 128
+    current_iter = max_iter
     success = False
 
     def getc(size, timeout=1):
