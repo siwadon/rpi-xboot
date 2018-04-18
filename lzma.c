@@ -18,13 +18,15 @@ SRes decode(unsigned int input_base, unsigned int output_base, unsigned int file
 
     // header: 5 bytes of LZMA properties and 8 bytes of uncompressed size
     Byte (*header)[header_size] = (Byte (*)[header_size]) input_base;
+    int hex = 0;
+    hex += ((*header)[0] & 0xFF) << 24;
+    hex += ((*header)[1] & 0xFF) << 16;
+    hex += ((*header)[2] & 0xFF) << 8;
+    hex += (*header)[3] & 0xFF;
 
     // Debug input buffer
     uart_putx((unsigned int) header);
-    uart_putx((*header)[0]);
-    uart_putx((*header)[1]);
-    uart_putx((*header)[2]);
-    uart_putx((*header)[3]);
+    uart_putx(hex);
 
     // Read and parse header
     for (i = 0; i < 8; i++)
