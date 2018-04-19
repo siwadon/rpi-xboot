@@ -30,7 +30,7 @@ pip3 install pyserial xmodem
 
 2. Download necessary boot files `bootcode.bin`, `start.elf`, `fixup.dat` to your SD card ([info](https://elinux.org/RPi_Software))
 ```bash
-curl -LO https://github.com/raspberrypi/firmware/raw/master/boot/\{bootcode.bin,start.elf,fixup.dat\}
+curl -LO https://github.com/idewz/raspbian-firmware/raw/master/\{bootcode.bin,start.elf,fixup.dat\}
 
 cp bootcode.bin start.elf fixup.dat /Volumes/boot/
 ```
