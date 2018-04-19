@@ -56,7 +56,7 @@ int kernel_main(void)
     uart_init();
     timer_init();
 
-    uart_puts("Hello from booloader\r\n");
+    uart_puts("Hello from boot loader\r\n");
     xmodem_packet_init(&packet, BUFFER_BASE);
 
     tx = timer_tick();
