@@ -6,6 +6,7 @@
 #include "lib/lzma/7zVersion.h"
 #include "lib/lzma/LzmaDec.h"
 
+
 SRes decode(unsigned int input_base, unsigned int output_base, unsigned int file_size) {
     UInt64 unpackSize = 0;
     int i;
