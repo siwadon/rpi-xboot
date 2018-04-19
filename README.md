@@ -40,9 +40,9 @@ cp bootcode.bin start.elf fixup.dat /Volumes/boot/
 make
 ```
 
-4. Copy `bootloader.bin` to the SD card with the name `kernel7.img`
+4. Copy `bootloader.img` to the SD card with the name `kernel7.img`
 ```bash
-cp bootloader.bin /Volumes/boot/kernel7.img
+cp bootloader.img /Volumes/boot/kernel7.img
 ```
 
 5. Create `config.txt` in the SD card with these lines
@@ -62,7 +62,7 @@ Before we can test it, please connect your serial cable to [pin 6, 8 and 10](htt
 Now we can test it with our simple uart program
 
 ```bash
-python3 rpi-install.py /dev/cu.usbserial uart.bin && kermit
+python3 rpi-install.py /dev/cu.usbserial uart.img && kermit
 ```
 
 You should see `Hello, UART` on your screen!

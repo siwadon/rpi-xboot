@@ -2,9 +2,7 @@ ARMGNU ?= arm-none-eabi
 
 COPS = -Wall -O2 -nostartfiles -ffreestanding
 
-gcc : uart.bin bootloader.bin
-
-all : gcc
+all : uart bootloader
 
 clean :
 	rm -f *.o
@@ -31,10 +29,10 @@ start_uart.o : start_uart.s
 uart.o : uart.c
 	$(ARMGNU)-gcc $(COPS) -c uart.c
 
-uart.bin : uart.ld start_uart.o periph.o uart.o 
+uart : uart.ld start_uart.o periph.o uart.o
 	$(ARMGNU)-ld start_uart.o periph.o uart.o -T uart.ld -o uart.elf
 	$(ARMGNU)-objdump uart.elf -D > uart.list
-	$(ARMGNU)-objcopy uart.elf -O binary uart.bin
+	$(ARMGNU)-objcopy uart.elf -O binary uart.img
 
 
 # LZMA
@@ -44,13 +42,13 @@ lzma.o : lzma.c
 7zFile.o: lib/lzma/7zFile.c
 	$(ARMGNU)-gcc $(COPS) -c lib/lzma/7zFile.c
 
-7zStream.o: lib/lzma/7zStream.c
+7zStream.o : lib/lzma/7zStream.c
 	$(ARMGNU)-gcc $(COPS) -c lib/lzma/7zStream.c
 
-Alloc.o: lib/lzma/Alloc.c
+Alloc.o : lib/lzma/Alloc.c
 	$(ARMGNU)-gcc $(COPS) -c lib/lzma/Alloc.c
 
-LzmaDec.o: lib/lzma/LzmaDec.c
+LzmaDec.o : lib/lzma/LzmaDec.c
 	$(ARMGNU)-gcc $(COPS) -c lib/lzma/LzmaDec.c
 
 
@@ -58,10 +56,10 @@ LzmaDec.o: lib/lzma/LzmaDec.c
 OBJS = \
 	start_bootloader.o \
 	periph.o \
-  Alloc.o \
-  LzmaDec.o \
-  7zFile.o \
-  7zStream.o \
+	Alloc.o \
+	LzmaDec.o \
+	7zFile.o \
+	7zStream.o \
 	lzma.o \
 	xmodem.o \
 	bootloader.o \
@@ -72,7 +70,7 @@ start_bootloader.o : start_bootloader.s
 bootloader.o : bootloader.c
 	$(ARMGNU)-gcc $(COPS) -c bootloader.c
 
-bootloader.bin : bootloader.ld $(OBJS)
+bootloader : bootloader.ld $(OBJS)
 	$(ARMGNU)-gcc $(COPS) -specs=nosys.specs -T bootloader.ld -o bootloader.elf $(OBJS)
 	$(ARMGNU)-objdump bootloader.elf -D > bootloader.list
-	$(ARMGNU)-objcopy bootloader.elf -O binary bootloader.bin
+	$(ARMGNU)-objcopy bootloader.elf -O binary bootloader.img
