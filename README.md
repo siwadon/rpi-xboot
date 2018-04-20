@@ -18,7 +18,7 @@ This repository contains the XMODEM-based boot loader that allows us to send a b
 1. [Driver for USB TTL Serial cable](http://www.prolific.com.tw/us/ShowProduct.aspx?pcid=41&showlevel=0041-0041)
 2. Python 3
 3. [GNU Arm Embedded Toolchain](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm)
-4. [xv6](https://github.com/zhiyihuang/xv6_rpi2_port)
+4. [xv6](https://github.com/idewz/xv6_rpi2_port)
 5. c-kermit
 
 ### Bootloader Setup
@@ -70,9 +70,9 @@ You should see `Hello, UART` on your screen!
 
 ### xv6
 
-To run [xv6](https://github.com/zhiyihuang/xv6_rpi2_port), you just need to clone the repository and update the location of the TOOLCHAIN in the [Makefile](https://github.com/zhiyihuang/xv6_rpi2_port/blob/master/Makefile#L6) and run
+To run [xv6](https://github.com/idewz/xv6_rpi2_port), you just need to clone the repository and update the location of the TOOLCHAIN in the [Makefile](https://github.com/idewz/xv6_rpi2_port/blob/master/Makefile#L6) and run
 
 ```bash
-make loader
+make
 python3 rpi-install.py /dev/cu.usbserial kernel7.img && kermit
 ```
