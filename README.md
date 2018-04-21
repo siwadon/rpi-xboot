@@ -23,34 +23,34 @@ This repository contains the XMODEM-based boot loader that allows us to send a b
 
 ### Bootloader Setup
 
-1. Install required python packages
+1. Clone this repository with its submodules
+```bash
+git clone --recurse-submodules git@github.com:idewz/rpi3.git
+
+# if you have already cloned
+git submodule update --init --recursive
+```
+
+2. Install required python packages
 ```bash
 pip3 install pyserial xmodem
 ```
 
-2. Download necessary boot files `bootcode.bin`, `start.elf`, `fixup.dat` to your SD card ([info](https://elinux.org/RPi_Software))
+3. Copy necessary boot files `bootcode.bin`, `start.elf`, `fixup.dat` and `config.txt` to your SD card ([info](https://elinux.org/RPi_Software))
 ```bash
-curl -LO https://github.com/idewz/raspbian-firmware/raw/master/\{bootcode.bin,start.elf,fixup.dat\}
+cp firmware/*.* /Volumes/boot
 
 cp bootcode.bin start.elf fixup.dat /Volumes/boot/
 ```
 
-3. Build the bootloader and the simple uart program
+4. Build the bootloader and the simple uart program
 ```bash
 make
 ```
 
-4. Copy `bootloader.img` to the SD card with the name `kernel7.img`
+5. Copy `bootloader.img` to the SD card with the name `kernel7.img`
 ```bash
 cp bootloader.img /Volumes/boot/kernel7.img
-```
-
-5. Create `config.txt` in the SD card with these lines
-```bash
-kernel_old=1
-disable_commandline_tags=1
-enable_uart=1
-
 ```
 
 Before we can test it, please connect your serial cable to [pin 6, 8 and 10](https://pinout.xyz/pinout/uart) of your RPi like this
@@ -70,9 +70,10 @@ You should see `Hello, UART` on your screen!
 
 ### xv6
 
-To run [xv6](https://github.com/idewz/xv6_rpi2_port), you just need to clone the repository and update the location of the TOOLCHAIN in the [Makefile](https://github.com/idewz/xv6_rpi2_port/blob/master/Makefile#L6) and run
+To run [xv6](https://github.com/idewz/xv6_rpi2_port), you just need to update the location of the TOOLCHAIN in the [Makefile](https://github.com/idewz/xv6_rpi2_port/blob/master/Makefile#L6) and run
 
 ```bash
+cd xv6
 make
-python3 rpi-install.py /dev/cu.usbserial kernel7.img && kermit
+python3 ../rpi-install.py /dev/cu.usbserial kernel7.img && kermit
 ```
