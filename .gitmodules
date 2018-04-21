@@ -1,6 +1,8 @@
 [submodule "firmware"]
 	path = firmware
 	url = git@github.com:idewz/rpi-firmware.git
+	branch = master
 [submodule "xv6"]
 	path = xv6
 	url = git@github.com:idewz/xv6_rpi2_port.git
+	branch = master
