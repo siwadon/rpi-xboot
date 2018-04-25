@@ -30,7 +30,7 @@ This repository contains the XMODEM-based boot loader that allows us to send a b
 ```bash
 git clone --recurse-submodules git@github.com:idewz/rpi3.git
 
-# if you have already cloned
+# use this if you have already cloned
 git submodule update --init
 ```
 
@@ -42,8 +42,6 @@ pip3 install pyserial xmodem
 3. Copy necessary boot files `bootcode.bin`, `start.elf`, `fixup.dat` and `config.txt` to your SD card ([info](https://elinux.org/RPi_Software))
 ```bash
 cp firmware/*.* /Volumes/boot
-
-cp bootcode.bin start.elf fixup.dat /Volumes/boot/
 ```
 
 4. Build the boot loader and the simple uart program
