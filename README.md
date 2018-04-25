@@ -31,7 +31,7 @@ This repository contains the XMODEM-based boot loader that allows us to send a b
 git clone --recurse-submodules git@github.com:idewz/rpi3.git
 
 # if you have already cloned
-git submodule update --init --recursive
+git submodule update --init
 ```
 
 2. Install required python packages
