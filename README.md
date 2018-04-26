@@ -74,3 +74,16 @@ cd xv6
 make
 python3 ../rpi-install.py /dev/cu.usbserial kernel7.img && kermit
 ```
+
+## Troubleshooting
+
+### Get an SSL error during `pip3 install`
+
+It is probably because you have an outdated version of OpenSSL. You can verify that using the following command.
+```bash
+python3 -c "import ssl; print(ssl.OPENSSL_VERSION)"
+
+OpenSSL 1.0.2o  27 Mar 2018
+```
+
+If you have an older version, for example, `0.9.8zh 14 Jan 2016`, please update to a newer version of Python via homebrew or get it from the [official website](https://www.python.org/downloads/)
