@@ -11,7 +11,7 @@ This repository contains the XMODEM-based boot loader that allows us to send a b
 ### Hardware
 
 1. Raspberry Pi 3 Model B
-2. SD Card
+2. micro-SD Card
 3. USB Power Cable
 4. [USB TTL Serial Cable](https://www.amazon.com/JBtek-Raspberry-Micro-Cable-Switch/dp/B00JU24Z3W)
 
@@ -87,3 +87,30 @@ OpenSSL 1.0.2o  27 Mar 2018
 ```
 
 If you have an older version, for example, `0.9.8zh 14 Jan 2016`, please update to a newer version of Python via homebrew or get it from the [official website](https://www.python.org/downloads/)
+
+### Read failed: device reports readiness to read but returned no data
+
+You need to quit current kermit before running `rpi-install.py`. In order to do that, just press `Ctrl + \` then `q`.
+
+### Send error: expected NAK, CRC, or CAN; got b'H' 
+
+After turn it on, you need to wait a few seconds before running `rpi-install.py` because the script expects valid characters, not "Hello" from the bootloader.
+
+### Cannot see anything in kermit
+
+Make sure you format your SD card in FAT32 (On MacOS, it is `MS-DOS (FAT)`). Then, verify the contents of the SD card. It should have
+```
+/Volumes/boot
+├── bootcode.bin
+├── config.txt
+├── fixup.dat
+├── kernel7.img    # a copy of bootloader.img
+└── start.elf
+```
+
+## Acknowledgements
+
+  - [xv6](https://github.com/zhiyihuang/xv6_rpi2_port) RPi port by Zhiyi Huang and Mahdi Amiri Kordestany
+  - [rpi-install.py](https://github.com/cs107e/cs107e.github.io/blob/master/cs107e/bin/rpi-install.py) by Pat Hanrahan, Julie Zelenski, Omar Rizwan from Standford [CS107e](https://github.com/cs107e)
+  - [LZMA SDK](https://www.7-zip.org/sdk.html) by Igor Pavlov
+  - [bootloader](https://github.com/dwelch67/raspberrypi) by David Welch

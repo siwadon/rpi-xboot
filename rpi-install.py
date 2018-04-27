@@ -166,7 +166,7 @@ your Pi plugged in?
 I waited a few seconds for an acknowledgement from the bootloader
 and didn't hear anything. Do you need to reset your Pi?
 
-Further help at http://cs107e.github.io/guides/bootloader/#troubleshooting
+Further help at https://github.com/idewz/rpi3#troubleshooting
 """)
     except serial.serialutil.SerialException as ex:
         error(str(ex))
