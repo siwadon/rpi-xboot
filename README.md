@@ -28,7 +28,7 @@ This repository contains the XMODEM-based boot loader that allows us to send a b
 
 1. Clone this repository with its submodules
 ```bash
-git clone --recurse-submodules git@github.com:idewz/rpi3.git
+git clone --recurse-submodules https://github.com/idewz/rpi3.git
 
 # use this if you have already cloned
 git submodule update --init
