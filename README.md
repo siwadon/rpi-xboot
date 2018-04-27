@@ -88,13 +88,9 @@ OpenSSL 1.0.2o  27 Mar 2018
 
 If you have an older version, for example, `0.9.8zh 14 Jan 2016`, please update to a newer version of Python via homebrew or get it from the [official website](https://www.python.org/downloads/)
 
-### Read failed: device reports readiness to read but returned no data
+### Nothing was found inside `firmware` and `xv6`
 
-You need to quit current kermit before running `rpi-install.py`. In order to do that, just press `Ctrl + \` then `q`.
-
-### Send error: expected NAK, CRC, or CAN; got b'H' 
-
-After turn it on, you need to wait a few seconds before running `rpi-install.py` because the script expects valid characters, not "Hello" from the bootloader.
+These 2 directories are [submobules](https://git-scm.com/book/en/v2/Git-Tools-Submodules). If they are empty, please run `git submodule update --init`.
 
 ### Cannot see anything in kermit
 
@@ -107,6 +103,15 @@ Make sure you format your SD card in FAT32 (On MacOS, it is `MS-DOS (FAT)`). The
 ├── kernel7.img    # a copy of bootloader.img
 └── start.elf
 ```
+
+### Read failed: device reports readiness to read but returned no data
+
+You need to quit current kermit before running `rpi-install.py`. In order to do that, just press `Ctrl + \` then `q`.
+
+### Send error: expected NAK, CRC, or CAN; got b'H'
+
+After turn it on, you need to wait a few seconds before running `rpi-install.py` because the script expects valid characters, not "Hello" from the bootloader.
+
 
 ## Acknowledgements
 
