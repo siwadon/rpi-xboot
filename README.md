@@ -20,16 +20,15 @@ This repository contains the XMODEM-based boot loader that allows us to send a b
 1. [Driver for USB TTL Serial cable](http://www.prolific.com.tw/us/ShowProduct.aspx?pcid=41&showlevel=0041-0041)
 2. Python 3
 3. [GNU Arm Embedded Toolchain](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm)
-4. [xv6](https://github.com/idewz/xv6_rpi2_port)
+4. [xv6](https://github.com/zhiyihuang/xv6_rpi2_port)
 5. c-kermit
 
 
 ## Boot Loader Setup
 
-1. Clone this repository with its submodules
+1. Clone this repository
 ```bash
-git clone --recurse-submodules https://github.com/idewz/rpi-xboot.git
-git submodule update --init
+git clone https://github.com/idewz/rpi-xboot.git
 ```
 
 2. Install required python packages
@@ -65,11 +64,32 @@ Then you should see `Hello, UART` on your screen!
 
 ## xv6
 
-To run [xv6](https://github.com/idewz/xv6_rpi2_port), you just need to update the location of the TOOLCHAIN in the [Makefile](https://github.com/idewz/xv6_rpi2_port/blob/master/Makefile#L6) and run
+To run [xv6](https://github.com/zhiyihuang/xv6_rpi2_port), please follow these steps.
 
+1. Clone the `xv6_rpi2_port`
 ```bash
-cd xv6
-make
+git clone https://github.com/zhiyihuang/xv6_rpi2_port
+cd xv6_rpi2_port
+```
+
+2. Update the location of the `TOOLCHAIN` in the [Makefile](https://github.com/zhiyihuang/xv6_rpi2_port/blob/master/Makefile#L6)
+
+3. Decrease the memory size in [`source/main.c`](https://github.com/zhiyihuang/xv6_rpi2_port/blob/master/source/main.c#L103) to get the shorter boot time
+```c
+// before
+kinit2(P2V((8*1024*1024)+PHYSTART), P2V(pm_size));
+
+// after
+kinit2(P2V((8*1024*1024)+PHYSTART), P2V((40*1024*1024)+PHYSTART));
+```
+
+4. Build the xv6 kernel image
+```bash
+make loader
+```
+
+5. Now you can send the kernel image to your RPi
+```bash
 python3 ../rpi-install.py /dev/cu.usbserial kernel7.img && kermit
 ```
 
@@ -85,10 +105,6 @@ OpenSSL 1.0.2o  27 Mar 2018
 ```
 
 If you have an older version, for example, `0.9.8zh 14 Jan 2016`, please update to a newer version of Python via homebrew or get it from the [official website](https://www.python.org/downloads/)
-
-### Nothing was found inside `firmware` and `xv6`
-
-These 2 directories are [submobules](https://git-scm.com/book/en/v2/Git-Tools-Submodules). If they are empty, please run `git submodule update --init`.
 
 ### Cannot see anything in kermit
 
