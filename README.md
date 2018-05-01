@@ -26,27 +26,27 @@ This repository contains the XMODEM-based boot loader that allows us to send a b
 
 ## Boot Loader Setup
 
-1. Clone this repository
+1. Clone this repository.
 ```bash
 git clone https://github.com/idewz/rpi-xboot.git
 ```
 
-2. Install required python packages
+2. Install required python packages.
 ```bash
 pip3 install pyserial xmodem
 ```
 
-3. Copy necessary boot files `bootcode.bin`, `start.elf`, `fixup.dat` and `config.txt` to your SD card ([info](https://elinux.org/RPi_Software))
+3. Copy necessary boot files `bootcode.bin`, `start.elf`, `fixup.dat` and `config.txt` to your SD card ([info](https://elinux.org/RPi_Software)).
 ```bash
 cp firmware/*.* /Volumes/boot
 ```
 
-4. Build the boot loader and the simple uart program
+4. Build the boot loader and the simple uart program.
 ```bash
 make
 ```
 
-5. Copy `bootloader.img` to the SD card with the name `kernel7.img`
+5. Copy `bootloader.img` to the SD card with the name `kernel7.img`.
 ```bash
 cp bootloader.img /Volumes/boot/kernel7.img
 ```
@@ -66,15 +66,15 @@ Then you should see `Hello, UART` on your screen!
 
 To run [xv6](https://github.com/zhiyihuang/xv6_rpi2_port), please follow these steps.
 
-1. Clone the `xv6_rpi2_port`
+1. Clone the `xv6_rpi2_port`.
 ```bash
 git clone https://github.com/zhiyihuang/xv6_rpi2_port
 cd xv6_rpi2_port
 ```
 
-2. Update the location of the `TOOLCHAIN` in the [Makefile](https://github.com/zhiyihuang/xv6_rpi2_port/blob/master/Makefile#L6)
+2. Update the location of the `TOOLCHAIN` in the [Makefile](https://github.com/zhiyihuang/xv6_rpi2_port/blob/master/Makefile#L6).
 
-3. Decrease the memory size in [`source/main.c`](https://github.com/zhiyihuang/xv6_rpi2_port/blob/master/source/main.c#L103) to get the shorter boot time
+3. Decrease the memory size in [`source/main.c`](https://github.com/zhiyihuang/xv6_rpi2_port/blob/master/source/main.c#L10) to get the shorter boot time.
 ```c
 // before
 kinit2(P2V((8*1024*1024)+PHYSTART), P2V(pm_size));
@@ -83,12 +83,14 @@ kinit2(P2V((8*1024*1024)+PHYSTART), P2V(pm_size));
 kinit2(P2V((8*1024*1024)+PHYSTART), P2V((40*1024*1024)+PHYSTART));
 ```
 
-4. Build the xv6 kernel image
+4. Also remove `gpuinit()` in [`source/main.c`](https://github.com/zhiyihuang/xv6_rpi2_port/blob/master/source/main.c#L91) to disable the GPU.
+
+5. Build the xv6 kernel image.
 ```bash
 make loader
 ```
 
-5. Now you can send the kernel image to your RPi
+5. Now you can send the kernel image to your RPi.
 ```bash
 python3 ../rpi-install.py /dev/cu.usbserial kernel7.img && kermit
 ```
@@ -104,7 +106,7 @@ python3 -c "import ssl; print(ssl.OPENSSL_VERSION)"
 OpenSSL 1.0.2o  27 Mar 2018
 ```
 
-If you have an older version, for example, `0.9.8zh 14 Jan 2016`, please update to a newer version of Python via homebrew or get it from the [official website](https://www.python.org/downloads/)
+If you have an older version, for example, `0.9.8zh 14 Jan 2016`, please update to a newer version of Python via homebrew or get it from the [official website](https://www.python.org/downloads/).
 
 ### Cannot see anything in kermit
 
