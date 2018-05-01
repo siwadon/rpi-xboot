@@ -3,7 +3,7 @@
 This repository contains the XMODEM-based boot loader that allows us to send a binary image to execute on Raspberry Pi. The boot loader supports LZMA compressed kernel image to reduce transfer time (in our case, from 60s to 10s).
 
 
-![](images/xv6.gif)
+![](images/xv6-bash.gif)
 
 
 ## What you need
