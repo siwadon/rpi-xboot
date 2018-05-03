@@ -26,7 +26,7 @@ loader_start:
     ands r0, r0, #0x03
     bne loader_sleep
 
-    mov sp, #0x10000
+    mov sp, #0x18000
     bl kernel_main
 
 hang:

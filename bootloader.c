@@ -6,7 +6,7 @@
 // so that the same binaries built for the SD card work with this bootloader.
 // Change the ARMBASE below to use a different location.
 
-#define ARM_BASE 0x0000
+#define ARM_BASE 0x8000
 #define BUFFER_BASE 0x00400000
 
 extern void mmio_write8(unsigned int, unsigned int);
