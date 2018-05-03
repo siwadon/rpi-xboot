@@ -15,12 +15,11 @@ int kernel_main(void)
     uart_init();
 
     uart_puts("Hello, UART\r\n");
-    uart_putx(0x12345678);
-    uart_putx(0xABCDEF);
+    uart_puts("PC = ");
     uart_putx(get_pc());
+    uart_puts("Green light is flashing .. forever\r\n");
 
     while(1) {
-        uart_puts(".");
         set_led_state(1);
         delay(5000000);
         set_led_state(0);
