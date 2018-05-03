@@ -92,7 +92,7 @@ make loader
 
 5. Now you can send the kernel image to your RPi.
 ```bash
-python3 ../rpi-install.py /dev/cu.usbserial kernel7.img && kermit
+python3 ../rpi-xboot/rpi-install.py /dev/cu.usbserial kernel7.img && kermit
 ```
 
 ## Troubleshooting
