@@ -73,6 +73,13 @@ cd xv6_rpi2_port
 ```
 
 2. Update the location of the `TOOLCHAIN` in the [Makefile](https://github.com/zhiyihuang/xv6_rpi2_port/blob/master/Makefile#L6).
+```make
+# If you already have it in your $PATH (in .bash_profile)
+  TOOLCHAIN?=arm-none-eabi-
+
+# Otherwise
+  TOOLCHAIN?=/path/to/your/gcc-arm-none-eabi-7-2017-q4-major/bin/arm-none-eabi- 
+```
 
 3. Decrease the memory size in [`source/main.c`](https://github.com/zhiyihuang/xv6_rpi2_port/blob/master/source/main.c#L10) to get the shorter boot time.
 ```c
