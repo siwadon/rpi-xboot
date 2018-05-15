@@ -19,11 +19,18 @@ extern void delay(unsigned int);
 #define ARM_TIMER_CNT   (P_BASE + 0xB420)   // Free running counter
 
 // GPIO registers
+#define GPFSEL0         (GPIO_BASE + 0x00)  // GPIO Function Select 0
 #define GPFSEL1         (GPIO_BASE + 0x04)  // GPIO Function Select 1
+#define GPFSEL2         (GPIO_BASE + 0x08)  // GPIO Function Select 2
 #define GPSET0          (GPIO_BASE + 0x1C)  // GPIO Pin Output Set 1
 #define GPCLR0          (GPIO_BASE + 0x28)  // GPIO Pin Output Clear 0
 #define GPPUD           (GPIO_BASE + 0x94)  // GPIO Pin Pull-up/down Enable
 #define GPPUDCLK0       (GPIO_BASE + 0x98)  // GPIO Pin Pull-up/down Enable Clock 0
+
+#define GPFSEL_PIN_MASK (7U)                // (BIT(2) | BIT(1) | BIT(0))
+#define GPFSEL_ALT_4    (3U)                // (BIT(1) | BIT(0))
+#define GPFSEL_ALT_5    (2U)                // (BIT(1))
+#define TIMEOUT         1000000
 
 // Auxilary Mini UART registers
 #define AUX_ENABLES     (UART_BASE + 0x04)  // Auxiliary Enables
@@ -41,7 +48,7 @@ extern void delay(unsigned int);
 
 void uart_init(void)
 {
-    unsigned int ra;
+    unsigned int gpfsel1;
 
     mmio_write(AUX_ENABLES,     1);
     mmio_write(AUX_MU_IER_REG,  0);
@@ -54,13 +61,13 @@ void uart_init(void)
 
     // GPIO 14 : TXD0 and TXD1
     // GPIO 15 : RXD0 and RXD1
-    ra = mmio_read(GPFSEL1);
-    ra &= ~(7 << 12); // GPIO 14
-    ra |= 2 << 12;    // ALT 5
-    ra &= ~(7 << 15); // GPIO 15
-    ra |= 2 << 15;    // ALT 5
+    gpfsel1 = mmio_read(GPFSEL1);
+    gpfsel1 &= ~(GPFSEL_PIN_MASK << 12); // GPIO 14
+    gpfsel1 |=  (GPFSEL_ALT_5    << 12); // Alt5: TXD
+    gpfsel1 &= ~(GPFSEL_PIN_MASK << 15); // GPIO 15
+    gpfsel1 |=  (GPFSEL_ALT_5    << 15); // Alt5: RXD
 
-    mmio_write(GPFSEL1, ra);
+    mmio_write(GPFSEL1, gpfsel1);
 
     // Disable pull up/down for all GPIO pins and delay for 150 cycles
     mmio_write(GPPUD, 0);
@@ -163,4 +170,55 @@ void timer_init(void)
 unsigned int timer_tick(void)
 {
     return mmio_read(ARM_TIMER_CNT);
+}
+
+void jtag_init() {
+    unsigned int gpfsel2;
+    unsigned int ra, rb;
+
+    gpfsel2 = mmio_read(GPFSEL2);
+    gpfsel2 &= ~(GPFSEL_PIN_MASK <<  6); // GPIO 22
+    gpfsel2 |=  (GPFSEL_ALT_4    <<  6); // Alt4: ARM_TRST
+    gpfsel2 &= ~(GPFSEL_PIN_MASK <<  9); // GPIO 23
+    gpfsel2 |=  (GPFSEL_ALT_4    <<  9); // Alt4: ARM_RTCK
+    gpfsel2 &= ~(GPFSEL_PIN_MASK << 12); // GPIO 24
+    gpfsel2 |=  (GPFSEL_ALT_4    << 12); // Alt4: ARM_TDO
+    gpfsel2 &= ~(GPFSEL_PIN_MASK << 15); // GPIO 25
+    gpfsel2 |=  (GPFSEL_ALT_4    << 15); // Alt4: ARM_TCK
+    gpfsel2 &= ~(GPFSEL_PIN_MASK << 18); // GPIO 26
+    gpfsel2 |=  (GPFSEL_ALT_4    << 18); // Alt4: ARM_TDI
+    gpfsel2 &= ~(GPFSEL_PIN_MASK << 21); // GPIO 27
+    gpfsel2 |=  (GPFSEL_ALT_4    << 21); // Alt4: ARM_TMS
+    mmio_write(GPFSEL2, gpfsel2);
+
+    mmio_write(GPPUD, 0);
+    delay(150);
+
+    mmio_write(GPPUDCLK0, (1 << 22) | (1 << 23) | (1 << 24) | (1 << 25) | (1 << 26) | (1 << 27));
+    delay(150);
+
+    mmio_write(GPPUDCLK0, 0);
+
+
+    rb=mmio_read(ARM_TIMER_CNT);
+
+    while(1)
+    {
+        mmio_write(GPSET0, 1 << 16);
+
+        while(1)
+        {
+            ra = mmio_read(ARM_TIMER_CNT);
+            if ((ra-rb) >= TIMEOUT) break;
+        }
+        rb += TIMEOUT;
+        mmio_write(GPCLR0, 1 << 16);
+
+        while(1)
+        {
+            ra = mmio_read(ARM_TIMER_CNT);
+            if ((ra-rb) >= TIMEOUT) break;
+        }
+        rb += TIMEOUT;
+    }
 }

@@ -2,7 +2,7 @@ ARMGNU ?= arm-none-eabi
 
 COPS = -Wall -O2 -nostartfiles -ffreestanding
 
-all : uart bootloader
+all : uart bootloader jlink
 
 clean :
 	rm -f *.o
@@ -74,3 +74,20 @@ bootloader : bootloader.ld $(OBJS)
 	$(ARMGNU)-gcc $(COPS) -specs=nosys.specs -T bootloader.ld -o bootloader.elf $(OBJS)
 	$(ARMGNU)-objdump bootloader.elf -D > bootloader.list
 	$(ARMGNU)-objcopy bootloader.elf -O binary bootloader.img
+
+# J-Link
+J_OBJS = \
+	start_jlink.o \
+	periph.o \
+	jlink.o \
+
+start_jlink.o : start_jlink.s
+	$(ARMGNU)-as start_jlink.s -o start_jlink.o
+
+jlink.o : jlink.c
+	$(ARMGNU)-gcc $(COPS) -c jlink.c
+
+jlink : jlink.ld $(J_OBJS)
+	$(ARMGNU)-gcc $(COPS) -specs=nosys.specs -T jlink.ld -o jlink.elf $(J_OBJS)
+	$(ARMGNU)-objdump jlink.elf -D > jlink.list
+	$(ARMGNU)-objcopy jlink.elf -O binary jlink.img
