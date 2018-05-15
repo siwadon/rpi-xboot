@@ -136,6 +136,19 @@ You need to quit current kermit before running `rpi-install.py`. In order to do 
 After turn it on, you need to wait a few seconds before running `rpi-install.py` because the script expects valid characters, not "Hello" from the bootloader.
 
 
+## J-Link debugger (in progress)
+
+1. Run `make` to create `jlink.img`, and copy it to the SD card.
+
+2. Follow [step 6](https://sysprogs.com/VisualKernel/tutorials/raspberry/jtagsetup/), but wire JTAG pin 5 to P1 pin 37
+![](images/jlink.jpg)
+
+3. Run this command to connect via `openocd`
+```bash
+openocd -f jlink.cfg -f raspi.cfg
+```
+
+
 ## Acknowledgements
 
   - [xv6](https://github.com/zhiyihuang/xv6_rpi2_port) RPi port by Zhiyi Huang and Mahdi Amiri Kordestany
