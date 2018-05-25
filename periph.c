@@ -173,8 +173,13 @@ unsigned int timer_tick(void)
 }
 
 void jtag_init() {
-    unsigned int gpfsel2;
+    unsigned int gpfsel0, gpfsel2;
     unsigned int ra, rb;
+
+    gpfsel0 = mmio_read(GPFSEL0);
+    gpfsel0 &= ~(GPFSEL_PIN_MASK << 12); // GPIO 4
+    gpfsel0 |=  (GPFSEL_ALT_5    << 12); // Alt5: ARM_TDI
+    mmio_write(GPFSEL0, gpfsel0);
 
     gpfsel2 = mmio_read(GPFSEL2);
     gpfsel2 &= ~(GPFSEL_PIN_MASK <<  6); // GPIO 22
@@ -185,8 +190,6 @@ void jtag_init() {
     gpfsel2 |=  (GPFSEL_ALT_4    << 12); // Alt4: ARM_TDO
     gpfsel2 &= ~(GPFSEL_PIN_MASK << 15); // GPIO 25
     gpfsel2 |=  (GPFSEL_ALT_4    << 15); // Alt4: ARM_TCK
-    gpfsel2 &= ~(GPFSEL_PIN_MASK << 18); // GPIO 26
-    gpfsel2 |=  (GPFSEL_ALT_4    << 18); // Alt4: ARM_TDI
     gpfsel2 &= ~(GPFSEL_PIN_MASK << 21); // GPIO 27
     gpfsel2 |=  (GPFSEL_ALT_4    << 21); // Alt4: ARM_TMS
     mmio_write(GPFSEL2, gpfsel2);
@@ -194,7 +197,7 @@ void jtag_init() {
     mmio_write(GPPUD, 0);
     delay(150);
 
-    mmio_write(GPPUDCLK0, (1 << 22) | (1 << 23) | (1 << 24) | (1 << 25) | (1 << 26) | (1 << 27));
+    mmio_write(GPPUDCLK0, (1 << 4) | (1 << 22) | (1 << 23) | (1 << 24) | (1 << 25) | (1 << 27));
     delay(150);
 
     mmio_write(GPPUDCLK0, 0);

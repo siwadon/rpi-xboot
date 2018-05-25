@@ -140,12 +140,12 @@ After turn it on, you need to wait a few seconds before running `rpi-install.py`
 
 1. Run `make` to create `jlink.img`, and copy it to the SD card.
 
-2. Follow [step 6](https://sysprogs.com/VisualKernel/tutorials/raspberry/jtagsetup/), but wire JTAG pin 5 to P1 pin 37
+2. Follow [step 6](https://sysprogs.com/VisualKernel/tutorials/raspberry/jtagsetup/)
 ![](images/jlink.jpg)
 
 3. Run this command to connect via `openocd`
 ```bash
-openocd -f jlink.cfg -f raspi.cfg
+openocd -f jlink.cfg -f rpi.cfg
 ```
 
 
