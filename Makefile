@@ -1,6 +1,6 @@
 ARMGNU ?= arm-none-eabi
 
-COPS = -Wall -O2 -nostartfiles -ffreestanding
+COPS = -g -Wall -O2 -nostartfiles -ffreestanding
 
 all : uart bootloader jlink
 
